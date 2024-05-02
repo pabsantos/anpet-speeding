@@ -1,0 +1,440 @@
+---
+title: "Artigo ANPET - Velocidades Inseguras"
+format:
+  pdf:
+    number-sections: true
+    colorlinks: true
+editor_options: 
+  chunk_output_type: console
+---
+
+## Importação e correção dos dados naturalísticos
+
+Os dados foram salvos previamente no formato `.parquet` e podem ser carregados com auxílio da biblioteca `arrow`.
+
+```{r}
+#| label: dados
+
+ndsbr_path <- here::here("data/ndsbr_sample.parquet")
+ndsbr_sample <- arrow::open_dataset(ndsbr_path)
+```
+
+Em seguida, seleciona-se as variáveis de interesse para o estudo de velocidade e transforma-se a base para `data.frame`.
+
+```{r}
+#| label: dataframe
+#| message: false 
+
+selected_cols <- c("driver", "trip", "long", "lat", "date", "time", "spd_kmh")
+speed_sample <- as.data.frame(ndsbr_sample[selected_cols], row.names = NULL)
+knitr::kable(head(speed_sample))
+```
+
+Próximo passo é filtrar algumas inconsistências na amostra original, como pontos que não tem coordenadas e não tem dados de velocidades.
+
+```{r}
+#| label: correcao
+
+filtered_speed_sample <- subset(
+  speed_sample, 
+  !is.na(speed_sample$spd_kmh) &
+  !is.na(speed_sample$long) &
+  !is.na(speed_sample$lat)
+)
+```
+
+Por fim, com auxílio do `sf`, é feita a conversão dos dados para pontos geográficos.
+
+```{r}
+#| label: sf_points
+
+speed_points <- sf::st_as_sf(
+  filtered_speed_sample,
+  coords = c("long", "lat"),
+  crs = "4674"
+)
+
+knitr::kable(head(speed_points))
+```
+
+## Entendendo a velocidade
+
+Antes de prosseguir com as análises espaciais, faz-se uma análise de distribuição dos dados de velocidade. Apenas com o vetor das velocidades, é elaborado um histograma com a amostra completa e também com partes da amostra acima de 5 km/h e acima de 10 km/h.
+
+```{r}
+#| label: hist
+#| message: false
+
+sapply(
+  c(0, 5, 10),
+  \(x) hist(
+    speed_points$spd_kmh[speed_points$spd_kmh >= x],
+    xlab = paste0("Velocidade (km/h) >= ", x),
+    main = "Distribuição da velocidade",
+    breaks = 20
+  )
+)
+```
+
+A partir dos histogramas, percebe-se a necessidade de remover os pontos com velocidades iguais a zero, para desconsiderar o tempo parado no trânsito. Dentre as duas opções de filtro (acima de 5 ou acima de 10), as análises foram baseadas nas velocidades iguais ou acima de 5.
+
+```{r}
+#| label: filter_vel
+
+speed_points_filtered <- speed_points[speed_points$spd_kmh > 5, ]
+```
+
+## Grid H3
+
+A análise espacial é realizada com base no grid H3, desenvolvido pelo Uber. O projeto "Acesso a Oportunidades", do IPEA, disponibiliza esse grid pronto para Curitiba, através do pacote `aopdata`.
+
+```{r}
+#| label: grid
+
+grid_cwb <- aopdata::read_grid(city = "cur")
+plot(grid_cwb["id_hex"], col = NA, main = NA)
+```
+
+Com spatial join é possível associar os pontos do nds-br com as informações do grid.
+
+```{r}
+#| label: join
+
+speed_points_grid <- sf::st_join(
+  sf::st_set_crs(speed_points_filtered, 4326),
+  grid_cwb
+)
+
+knitr::kable(head(speed_points_grid))
+```
+
+## Análise da amostra do nds-br
+
+Aqui o primeiro passo é entender a distribuição espacial da amostra, ou seja, quanto tempo de viagem cada célula do grid tem de amostra.
+
+```{r}
+#| label: map-travel
+
+travel_time_minutes <- table(speed_points_grid$id_hex) / 60
+travel_df <- as.data.frame(travel_time_minutes)
+names(travel_df) <- c("id_hex", "travel_time_minutes")
+grid_travel <- merge(grid_cwb, travel_df, by = "id_hex", all.x = TRUE)
+grid_travel$travel_time_minutes[is.na(grid_travel$travel_time_minutes)] <- 0
+plot(
+  grid_travel["travel_time_minutes"],
+  main = "Tempo de viagem (minutos)",
+  graticule = TRUE,
+  axes = TRUE,
+  border = NA,
+  breaks = c(seq(0, 160, 10))
+)
+```
+
+Com o histrograma fica mais fácil de observar o comportamento da distribuição
+
+```{r}
+#| label: hist-travel
+
+hist(
+  grid_travel$travel_time_minutes,
+  xlab = "Tempo de viagem (minutos)",
+  main = ""
+)
+```
+
+Grande parte da amostra se encontra na faixa entre 0 e 5 minutos de tempo de viagem. Assim, decidiu-se fazer outro histrograma só com os tempos acima de 0
+
+```{r}
+#| label: hist-travel-nonzero
+
+hist(
+  grid_travel$travel_time_minutes[grid_travel$travel_time_minutes > 0],
+  xlab = "Tempo de viagem (minutos)",
+  main = ""
+)
+```
+
+Ainda assim, boa parte das células da amostra apresentam tempos de viagem até 5 minutos. A seguir está o cálculo exato de quantas celulas contêm / não contêm tempos de viagem.
+
+```{r}
+#| label: travel-time-count
+
+total_celulas <- nrow(grid_cwb)
+celulas_travel <- sum(grid_travel$travel_time_minutes > 0)
+celulas_notravel <- total_celulas - celulas_travel
+```
+
+O território de Curitiba possui um total de `r total_celulas` células do grid H3. Deste total, `r celulas_travel` possuem amostra do nds-br passando em sua área e `r celulas_notravel` sem amostra.
+
+## Análise espacial da velocidade
+
+Com os dados de velocidade associados aos grids, é possível fazer uma análise exploratória da velocidade insegura no território de Curitiba com base nos seguintes indicadores:
+
+- (V1) Velocidade média
+- (V2) Velocidade mediana
+- (V3) Desvio padrão da velocidade
+- (V4) 85º quantil da velocidade
+
+```{r}
+results_v1_v3 <- sapply(
+  list(mean, median, sd),
+  \(x) tapply(speed_points_grid$spd_kmh, speed_points_grid$id_hex, x)
+)
+
+v4 <- tapply(
+  speed_points_grid$spd_kmh,
+  speed_points_grid$id_hex,
+  quantile,
+  p = 0.85
+)
+
+results_df <- 
+  data.frame(
+    results_v1_v3,
+    V4 = v4,
+    id_hex = row.names(results_v1_v3),
+    row.names = NULL
+  )
+
+names(results_df) <- c("V1", "V2", "V3", "V4", "id_hex")
+knitr::kable(head(results_df))
+```
+
+Com os indicadores resultantes, é possível uni-las com o grid através da chave única.
+
+```{r}
+#| label: merge
+
+grid_cwb_indicadores <- 
+  merge(grid_cwb, results_df, by = "id_hex", all.x = TRUE)
+
+knitr::kable(head(grid_cwb_indicadores))
+```
+
+## Mapeando os resultados
+
+```{r}
+#| label: mapas
+
+library(ggplot2)
+library(patchwork)
+
+plot_indicadores <- function(ind) {
+  ggplot() +
+    geom_sf(
+      data = grid_cwb_indicadores,
+      aes(fill = {{ ind }}, color = {{ ind }}),
+      #color = NA,
+      lwd = 0.1
+    ) +
+    scale_fill_viridis_c(na.value = "grey80", option = "A", direction = 1) +
+    scale_color_viridis_c(na.value = "grey80", option = "A", direction = 1) +
+    theme_void() +
+    theme(legend.position = "top")
+}
+
+plot_indicadores(V1) + plot_indicadores(V2)
+```
+
+```{r}
+#| label: mapas_2
+
+plot_indicadores(V3) + plot_indicadores(V4)
+```
+
+## Distribuição dos indicadores
+
+Plotando as densidades para avaliar a distribuição dos indicadores
+
+```{r}
+#| label: hist-indicadores
+
+table_vars_long <- grid_cwb_indicadores |> 
+  sf::st_drop_geometry() |> 
+  dplyr::select(V1:V4) |> 
+  tidyr::pivot_longer(
+    dplyr::everything(),
+    values_to = "value",
+    names_to = "var"
+  ) |> 
+  tidyr::drop_na()
+
+ggplot(table_vars_long, aes(x = value, color = var)) +
+  geom_density() +
+  theme_minimal()
+```
+
+A média (V1) e a mediana (V2) possuem uma distribuição similar. Desvio padrão tem um valor máximo que se aproxima em 25 km/h, e o 85º quantil possui uma distribuição de formato similar a V1 e V2, porém, com valores maiores.
+
+## Correlação entre indicadores de velocidade
+
+Aqui é analisada a correlação entre os indicadores, para detectar colinearidade dentro da amostra
+
+```{r}
+#| label: cor-indicadores
+
+var_cols <- c("V1", "V2", "V3", "V4")
+vars_df <- sf::st_drop_geometry(grid_cwb_indicadores[var_cols])
+vars_df <- subset(vars_df, !is.na(V1) & !is.na(V3))
+
+cor_spearman <- psych::corr.test(vars_df)
+cor_spearman$r
+cor_spearman$p
+```
+V1, V2 e V4 possuem uma correlação alta (> 0.9). Assim, não faz sentido considerar esses três indicadores para analisar velocidade insegura. V3 possui uma correlação um pouco maior com V4 (> 0.4). Na análise da velocidade insegura, talvez faça mais sentido em utilizar apenas um indicador de frequência (V1, V2 ou V4) e um indicador de dispersão (V3). Todos os resultados são estatisticamente significativos no nível de 95% da confiabilidade (p-valor < 0,05).
+
+## Autocorrelação global e local
+
+Dois passos importantes para analisar o comportamento espacial da amostra consiste em analisar a presença de autocorrelação global e local
+
+### Moran's I
+
+Para a analise global aplica-se o método do I de Moran, considerando a configuração "queen" para analisar os lags espaciais, em que cada vizinho possui um peso igual (`style = "W"`).
+
+```{r}
+#| label: imoran
+#| message: false
+
+library(spdep)
+
+## Removendo os grids sem dados de indicadores (NA)
+
+grid_ind <- 
+  subset(
+    grid_cwb_indicadores,
+    !is.na(V1) & !is.na(V2) & !is.na(V3) & !is.na(V4)
+  )
+
+## Processeguindo com o método
+
+nb <- poly2nb(grid_ind, queen = TRUE)
+lw <- nb2listw(nb, style = "W", zero.policy = TRUE)
+```
+
+Plotando o lag espacial para os 4 indicadores.
+
+```{r}
+#| label: sp-lag
+#| message: false
+
+ind_lags <- sapply(
+  list(grid_ind$V1, grid_ind$V2, grid_ind$V3, grid_ind$V4),
+  lag.listw,
+  x = lw
+)
+
+ind_lags_df <- as.data.frame(ind_lags)
+names(ind_lags_df) <- c("lag_V1", "lag_V2", "lag_V3", "lag_V4")
+df_lags <- cbind(ind_lags_df, sf::st_drop_geometry(grid_ind))
+
+plot_lag <- function(ind, lag_ind) {
+  # lmax <- ifelse({{ ind }} == V3, 40, 100)
+  
+  ggplot(df_lags, aes(x = {{ ind }}, y = {{ lag_ind }})) +
+    geom_abline(
+      intercept = 0,
+      slope = 1,
+      color = "grey20",
+      lty = "dashed",
+      lwd = 0.5
+    ) +
+    geom_point(pch = 21, alpha = 0.7) +
+    geom_smooth(
+      method = "lm",
+      se = FALSE,
+      color = "red",
+      lty = "dashed",
+      lwd = 1
+    ) +
+    coord_equal() +
+    scale_x_continuous(limits = c(0, 100)) +
+    scale_y_continuous(limits = c(0, 100)) +
+    theme_minimal()
+}
+
+plot_lag(V1, lag_V1) + plot_lag(V2, lag_V2)
+```
+
+```{r}
+#| label: plot-lag
+#| message: false
+#| warning: false
+
+plot_lag(V3, lag_V3) + plot_lag(V4, lag_V4)
+```
+
+A linha pontilhada em vermelho indica a reta da regressão linear com base nos valores reais e lags espaciais desses valores. Uma análise visual previa já indica uma presença que uma autocorrelação global em um comportamento clusterizado. Porém, para ter certeza, é necessário calcular o resultado. O calculo do I de Moran foi realizado com base no método de Monte Carlo, com mil simulações.
+
+```{r}
+#| label: mcmoran
+
+set.seed(42)
+
+moran_results <- lapply(
+  list(grid_ind$V1, grid_ind$V2, grid_ind$V3, grid_ind$V4),
+  moran.mc,
+  listw = lw,
+  alternative = "greater",
+  nsim = 999
+)
+
+extract_moran_results <- function(results) {
+  moran_stat <- vector()
+  moran_pvalue <- vector()
+  for (i in 1:length(results)) {
+    moran_stat[i] <- moran_results[[i]]$statistic
+    moran_pvalue[i] <- moran_results[[i]]$p.value
+  }
+  df <- data.frame(
+    indicadores = c("V1", "V2", "V3", "V4"),
+    moran_stat = moran_stat,
+    moran_pvalue = moran_pvalue
+  )
+  return(df)
+}
+
+tbl_moran <- extract_moran_results(moran_results)
+knitr::kable(tbl_moran)
+```
+
+Todos os indicadores apresentaram um I de Moran maior que zero, com resultados estatisticamente significativos. Também é possível plotar a distribuição dos valores resultantes da simulação de Monte Carlo.
+
+```{r}
+#| label: plot-montecarlo
+
+sapply(moran_results, plot)
+```
+
+### Moran Local
+
+Com o calculo da autocorrelação global elaborado, segue-se para o calculo da autocorrelação local através do Moran Local, possibilitando o mapeamento desse padrão espacial.
+
+```{r}
+#| label: local-moran
+
+library(rgeoda)
+
+queen_w <- queen_weights(grid_ind, order = 1)
+
+lisa_results <- lapply(
+  list(grid_ind["V1"], grid_ind["V2"], grid_ind["V3"], grid_ind["V4"]),
+  local_moran,
+  w = queen_w
+)
+
+
+lisa_v1 <- local_moran(queen_w, grid_ind["V1"])
+grid_ind$lisa_v1 <- as.factor(lisa_clusters(lisa_v1, cutoff = 0.05))
+levels(grid_ind$lisa_v1) <- lisa_labels(lisa_v1)
+
+ggplot() +
+  geom_sf(data = grid_cwb, fill = "grey60", color = NA) +
+  geom_sf(data = grid_ind, aes(fill = lisa_v1), lwd = 0.1) +
+  scale_fill_manual(values = lisa_colors(lisa_v1)) +
+  theme_void()
+```
+
+
+## Correlação com indicadores socioeconômicos
+
+## Correlação com sinistros fatais
