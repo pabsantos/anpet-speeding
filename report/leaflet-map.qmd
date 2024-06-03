@@ -1,0 +1,171 @@
+---
+title: "anpet-speed-map"
+author: "Pedro Augusto Borges"
+format: 
+  dashboard:
+    warning: false
+    message: false
+    echo: false
+editor: source
+---
+
+```{r}
+
+library(leaflet)
+library(sf)
+library(here)
+
+ind_grid_moran <- st_read(here("data", "ind_grid_moran.geojson"), quiet = TRUE)
+lisa_grouped <- st_read(here("data", "lisa_grouped.geojson"), quiet = TRUE)
+radar_sf <- st_read(here("data", "radar.geojson"), quiet = TRUE)
+
+## Dist
+dist_bin <- c(
+  0, 20, 40, 60, 80, 100, 120, 245
+)
+dist_pal <- colorBin(
+  palette = "viridis",
+  bins = dist_bin,
+  domain = ind_grid_moran$travel_time_minutes
+)
+
+## Percentil
+perc_bin <- c(
+  0.1,
+  30,
+  40,
+  50,
+  60,
+  70,
+  80,
+  120
+)
+perc_pal <- colorBin(
+  palette = "viridis",
+  bins = perc_bin,
+  domain = ind_grid_moran$percentil_speed
+)
+
+## Desvio padrão
+sd_bin <- c(0, 10, 15, 20, 25, 40)
+sd_pal <- colorBin(
+  bin = sd_bin,
+  palette = "viridis",
+  domain = ind_grid_moran$sd_speed
+)
+
+## Local Moran
+pal <- colorFactor(
+  palette = c("red", "blue"),
+  domain = lisa_grouped$lisa_ord_group
+)
+
+radar_sf_velocidade <- subset(radar_sf, ctrl_vel == 1)
+
+controlador_url <- 
+  "https://transito.curitiba.pr.gov.br/include/design/img/marcador-discreto.png"
+redutor_url <- 
+  "https://transito.curitiba.pr.gov.br/include/design/img/marcador-lombada2.png"
+
+icon_radar_cwb <- makeIcon(
+  iconUrl = ifelse(
+    radar_sf_velocidade$tipo == "Controlador",
+    controlador_url,
+    redutor_url
+  ),
+  iconWidth = 20,
+  iconHeight = 25
+)
+
+icon_awesome <- makeAwesomeIcon(
+  icon = "location",
+  markerColor = ifelse(
+    radar_sf_velocidade$tipo == "Controlador",
+    "purple",
+    "darkgreen"
+  ),
+  library = "ion"
+)
+
+html_icon_legend <- paste0(
+  "<img src='",
+  controlador_url,
+  "'>Controlador<br/><img src='",
+  redutor_url,
+  "'>Redutor"
+)
+
+leaflet(lisa_grouped) |> 
+  addProviderTiles(providers$Stadia.AlidadeSmoothDark) |> 
+  addPolygons(
+    fillColor = ~pal(lisa_ord_group),
+    color = NA, 
+    fillOpacity = 0.4,
+    group = "Local Moran"
+  ) |> 
+  addPolygons(
+    data = ind_grid_moran,
+    fillColor = ~dist_pal(travel_time_minutes),
+    color = NA,
+    fillOpacity = 0.5,
+    group = "Tempo de viagem"
+  ) |>
+  addPolygons(
+    data = ind_grid_moran,
+    fillColor = ~perc_pal(percentil_speed),
+    color = NA,
+    fillOpacity = 0.5,
+    group = "Velocidade de 85º percentil"
+  ) |> 
+  addPolygons(
+    data = ind_grid_moran,
+    fillColor = ~sd_pal(sd_speed),
+    color = NA,
+    fillOpacity = 0.5,
+    group = "Desvio padrão da velocidade"
+  ) |> 
+  addLegend(
+    pal = pal,
+    values = ~lisa_ord_group,
+    title = "Local Moran",
+    group = "Local Moran"
+  ) |> 
+  addLegend(
+    data = ind_grid_moran,
+    pal = dist_pal,
+    values = ~travel_time_minutes,
+    title = "Tempo de viagem",
+    group = "Tempo de viagem"
+  ) |> 
+  addLegend(
+    data = ind_grid_moran,
+    pal = perc_pal,
+    values = ~percentil_speed,
+    title = "Velocidade de 85º percentil",
+    group = "Velocidade de 85º percentil"
+  ) |> 
+  addLegend(
+    data = ind_grid_moran,
+    pal = sd_pal,
+    values = ~sd_speed,
+    title = "Desvio padrão da velocidade",
+    group = "Desvio padrão da velocidade"
+  ) |> 
+  addMarkers(
+    data = radar_sf_velocidade,
+    icon = icon_radar_cwb,
+    group = "Radares"
+  ) |> 
+  addLayersControl(
+    overlayGroups = c(
+      "Local Moran", "Tempo de viagem", "Radares", 
+      "Velocidade de 85º percentil", "Desvio padrão da velocidade"
+    ),
+    position = "bottomleft"
+  ) |> 
+  hideGroup(
+    c(
+      "Local Moran", "Tempo de viagem", "Radares", "Desvio padrão da velocidade"
+    )
+  )
+```

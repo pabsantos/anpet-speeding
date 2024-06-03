@@ -283,6 +283,10 @@ cor_spearman$p
 ```
 V1, V2 e V4 possuem uma correlação alta (> 0.9). Assim, não faz sentido considerar esses três indicadores para analisar velocidade insegura. V3 possui uma correlação um pouco maior com V4 (> 0.4). Na análise da velocidade insegura, talvez faça mais sentido em utilizar apenas um indicador de frequência (V1, V2 ou V4) e um indicador de dispersão (V3). Todos os resultados são estatisticamente significativos no nível de 95% da confiabilidade (p-valor < 0,05).
 
+### Relação entre os indicadores
+
+
+
 ## Autocorrelação global e local
 
 Dois passos importantes para analisar o comportamento espacial da amostra consiste em analisar a presença de autocorrelação global e local
@@ -363,7 +367,7 @@ plot_lag(V1, lag_V1) + plot_lag(V2, lag_V2)
 plot_lag(V3, lag_V3) + plot_lag(V4, lag_V4)
 ```
 
-A linha pontilhada em vermelho indica a reta da regressão linear com base nos valores reais e lags espaciais desses valores. Uma análise visual previa já indica uma presença que uma autocorrelação global em um comportamento clusterizado. Porém, para ter certeza, é necessário calcular o resultado. O calculo do I de Moran foi realizado com base no método de Monte Carlo, com mil simulações.
+A linha pontilhada em vermelho indica a reta da regressão linear com base nos valores reais e lags espaciais desses valores. Uma análise visual previa já indica uma presença que uma autocorrelação global em um comportamento clusterizado. Porém, para ter certeza, é necessário calcular o resultado. O calculo do I de Moran foi realizado com base no método de Monte Carlo, com 10 mil simulações.
 
 ```{r}
 #| label: mcmoran
@@ -375,7 +379,7 @@ moran_results <- lapply(
   moran.mc,
   listw = lw,
   alternative = "greater",
-  nsim = 999
+  nsim = 9999
 )
 
 extract_moran_results <- function(results) {
@@ -407,7 +411,7 @@ sapply(moran_results, plot)
 
 ### Moran Local
 
-Com o calculo da autocorrelação global elaborado, segue-se para o calculo da autocorrelação local através do Moran Local, possibilitando o mapeamento desse padrão espacial.
+Com o calculo da autocorrelação global elaborado, segue-se para o calculo da autocorrelação local através do Moran Local com vizinhos de primeira ordem, possibilitando o mapeamento desse padrão espacial.
 
 ```{r}
 #| label: local-moran
@@ -422,7 +426,6 @@ lisa_results <- lapply(
   w = queen_w
 )
 
-
 lisa_v1 <- local_moran(queen_w, grid_ind["V1"])
 grid_ind$lisa_v1 <- as.factor(lisa_clusters(lisa_v1, cutoff = 0.05))
 levels(grid_ind$lisa_v1) <- lisa_labels(lisa_v1)
@@ -434,7 +437,12 @@ ggplot() +
   theme_void()
 ```
 
+### Testando o Local Moran para diferentes ordens
+
+Vizinhos de segunda e terceira ordem
 
 ## Correlação com indicadores socioeconômicos
 
 ## Correlação com sinistros fatais
+
+- Modelo de previsão da chance de ocorrência de fatalidades com base nos indicadores de velocidade
