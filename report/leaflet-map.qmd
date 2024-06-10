@@ -15,8 +15,8 @@ library(leaflet)
 library(sf)
 library(here)
 
-ind_grid_moran <- st_read(here("data", "ind_grid_moran.geojson"), quiet = TRUE)
-lisa_grouped <- st_read(here("data", "lisa_grouped.geojson"), quiet = TRUE)
+ind_grid_moran <- st_read(here("data", "ind_grid_moran.gpkg"), quiet = TRUE)
+lisa_grouped <- st_read(here("data", "lisa_grouped.gpkg"), quiet = TRUE)
 radar_sf <- st_read(here("data", "radar.geojson"), quiet = TRUE)
 
 ## Dist

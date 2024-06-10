@@ -100,7 +100,7 @@ data_export <- list(grid_cwb, ind_grid_moran, lisa_grouped)
 data_path <- paste0(
   "data/",
   c("grid_cwb", "ind_grid_moran", "lisa_grouped"),
-  ".geojson"
+  ".gpkg"
 )
 
-purrr::map2(data_export, data_path, st_write)
+purrr::map2(data_export, data_path, st_write, append = FALSE)
