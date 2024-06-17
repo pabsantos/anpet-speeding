@@ -9,6 +9,8 @@ library(ggplot2)
 library(onsvplot)
 library(patchwork)
 library(gghighlight)
+library(ndsbr)
+library(dplyr)
 
 set.seed(123)
 
@@ -18,6 +20,7 @@ source("R/03-create-grid-sample.R")
 source("R/04-local-moran.R")
 source("R/05-ecdf-plot.R")
 source("R/06-plot-maps.R")
+source("R/07-sample-stats.R")
 source("R/99-export.R")
 
 # Importando os dados ----
@@ -69,6 +72,19 @@ local_moran_map <- plot_local_moran_map(ind_grid_moran, grid_cwb, border_color)
 
 lisa_grouped <- group_moran_results(ind_grid_moran)
 lisa_grouped_map <- plot_moran_group_map(lisa_grouped)
+
+# Informações da amostra nds-br -------------------------------------------
+
+horas_total = calc_nds_time(speed_sample)
+horas_filtrado = calc_nds_time(filtered_speed_sample)
+
+dist_total = calc_nds_dist(speed_sample)
+dist_filtrado = calc_nds_dist(speed_points)
+
+days_table = calc_nds_days(speed_sample)
+days_total = sum(days_table$n)
+
+dados_condutores = extract_driver_data(ndsbr::ndsdrivers)
 
 # Exporta os resultados ----
 
