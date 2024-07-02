@@ -21,6 +21,7 @@ source("R/04-local-moran.R")
 source("R/05-ecdf-plot.R")
 source("R/06-plot-maps.R")
 source("R/07-sample-stats.R")
+source("R/08-identify-hex.R")
 source("R/99-export.R")
 
 # Importando os dados ----
@@ -86,6 +87,14 @@ days_total = sum(days_table$n)
 
 dados_condutores = extract_driver_data(ndsbr::ndsdrivers)
 
+# Extrai os High-High e High-Low do lmoran ----
+
+ind_grid_high = filter_grid_high(ind_grid_moran)
+axis_grid = join_grid_axis(ind_grid_high, ndsbr::ippuc_road_axis)
+axis_grid_map = plot_axis_grid_map(axis_grid)
+axis_grid_speed_map = plot_axis_speed(axis_grid)
+axis_length_table = calc_axis_len(axis_grid, HIERARQUIA)
+
 # Exporta os resultados ----
 
 ecdf_names <- c("plot/ecdf_grid_plot.svg", "plot/ecdf_points_plot.svg")
@@ -96,7 +105,9 @@ maps_names <- paste0(
     "percentil_map",
     "sd_map",
     "local_moran_map",
-    "lisa_grouped_map"
+    "lisa_grouped_map",
+    "axis_grid_map",
+    "axis_grid_speed_map"
   ),
   ".svg"
 )
@@ -106,7 +117,9 @@ maps_list <- list(
   percentil_map,
   sd_map,
   local_moran_map,
-  lisa_grouped_map
+  lisa_grouped_map,
+  axis_grid_map,
+  axis_grid_speed_map
 )
 
 export_plot(ecdf_names, list(ecdf_grid_plot, ecdf_points_plot), height = 3.5)
@@ -120,3 +133,5 @@ data_path <- paste0(
 )
 
 purrr::map2(data_export, data_path, st_write, append = FALSE)
+
+readr::write_csv(axis_length_table, "data/axis_length_table.csv")
