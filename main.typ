@@ -116,14 +116,14 @@ Com a velocidade insegura mapeada em Curitiba e seu padrão espacial identificad
 
 O primeiro fator que fica mais explícito é a ocorrência de V85 em todas as faixas entre 40 e 120 km/h nas vias locais, com maior quantidade na faixa entre 70 e 80 km/h, mostrando velocidades inseguras e totalmente incompartíveis com as funções dessa hierarquia viária. No caso das coletoras, a incidência de V85 ficou entre 40 e 90 km/h, com a maior parte entre 50 e 60 km/h. As vias arteriais apresentaram a menor extensão dentro dos hexágonos _High-High_ e _ High-Low_, com V85 variando entre 40 e 80 km/h. As vias de trânsito rápido apresentaram V85 na faixa de 40 a 120 km/h, com a maioria da extensão entre 70 e 80 km/h.
 
-
 = CONCLUSÃO
 
-- Velocidades inseguras != excesso de velocidade
-- Centro da cidade
-- Dois fatores: vias locais e travessias urbanas
-- Problema da insegurança nas travessias urbanas (vias de característica rural -- BR-277 -- que passa por curitiba.)
-- Conflito hierarquia viária x velocidade
-- Imprecisão dos resultados, fazer um trabalho direto com os eixos de vias
-- Arteriais = menos excesso -> santos (2022)
-- V85 em vias locais -> situação insegura e incompartível com o tipo das vias
+As altas velocidades e velocidades incompartíveis com o ambiente urbano ainda é um fator de risco para a mobilidade segura nos centros urbanos, principalmente no Brasil. Com o uso dos dados de velocidade instantânea do NDS-BR e do grid H3, foi possível mapear e calcular a autocorrelação local das velocidades inseguras em Curitiba, utilizando o V85 calculado como indicador. Esse processo possibilitou identificar os locais mais inseguros, estabelecidos pelos hexágonos classificados como _High-High_ e _High-Low_.
+
+A parte central da cidade apresentou a maior quantidade de clusters _Low-Low_, representando as regiões com velocidades mais seguras. Os hexágonos identificados como _High-High_ estão em sua grande maioria localizados nos contornos rodoviários de Curitiba e outros locais de rodovias que passam pelo território da cidade. Isso mostra um dos problemas das travessias urbanas - vias com veículos transitando em altas velocidades dentro do território urbano. Vias locais também foram englobadas em clusters _High-High_ e outliers _High-Low_, mostrando uma insegurança nessas vias, cujo objetivo é ter uma função mais de acesso com trânsito mais acalmado, mas que vem apresentando velocidades incompartíveis com as suas características, conforme visto na @tbl-dist.
+
+De todas as hierarquias analisadas nas zonas com velocidades mais inseguras, as vias arteriais tiveram a menor extensão englobada nessas áreas. Esse fator se assemelha com o comportamento identificado por #cite(<santosImpactBuiltEnvironment2022>, form: "prose"), em que zonas de tráfego com uma maior densidade de vias arteriais apresentaram uma correlação negativa com a incidência do excesso de velocidade. Os resultados desse trabalho podem ser mais um indicador do desempenho positivo da segurança nas vias arteriais de Curitiba.
+
+Por fim, o presente trabalho buscou analisar a velocidade como um fator de risco sem se basear apenas no excesso de velocidade, mas sim no conceito de velocidades inseguras. Quando os limites de velocidade estabelecidos pelo poder público não atendem a mobilidade segura nas cidades, o diagnóstico com base no excesso de velocidade pode não demonstrar um cenário mais completo.
+
+Para futuras pesquisas, deve-se aprimorar o processo de análise dos eixos das vias. O uso de polígonos para mapear o V85 trouxe uma certa imprecisão para os resultados calculados considerando a hierarquia das vias.
