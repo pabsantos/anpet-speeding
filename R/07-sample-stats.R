@@ -39,10 +39,11 @@ calc_nds_days = function(ndsbr_data) {
 }
 
 extract_driver_data = function(drivers) {
-  drivers$SEX = as.factor(drivers$SEX)
-  drivers$AGE = as.numeric(drivers$AGE)
-  drivers$MODEL_YEAR = as.numeric(drivers$MODEL_YEAR)
-  drivers$HP = as.numeric(drivers$HP)
+  drivers$sex <- as.factor(drivers$sex)
+  drivers$age <- as.numeric(drivers$age)
+  drivers$vehicle_age <- as.numeric(drivers$vehicle_age)
+  drivers$vehicle_hp <- as.numeric(drivers$vehicle_hp)
+  drivers$vehicle_transmission <- as.factor(drivers$vehicle_transmission)
   summary(drivers)
 }
 

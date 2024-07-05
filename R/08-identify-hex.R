@@ -27,7 +27,7 @@ plot_axis_speed <- function(axis_grid_data) {
   ggplot(axis_grid_data) +
     geom_sf(aes(color = percentil_speed), lwd = 0.1) +
     scale_color_viridis_c(
-      na.value = "grey30",
+      na.value = "grey80",
       option = "A",
       direction = 1,
       begin = 0.45,
@@ -36,16 +36,17 @@ plot_axis_speed <- function(axis_grid_data) {
     theme_void(base_size = 8) +
     labs(color = "V85") +
     theme(
-      plot.background = element_rect(fill = "grey10", color = "grey10"),
+      # plot.background = element_rect(fill = "grey10", color = "grey10"),
       legend.position = c(0.90, 0.20),
-      legend.title = element_text(size = 8, color = "grey90"),
-      legend.text = element_text(size = 6, color = "grey90"),
+      # legend.title = element_text(size = 8, color = "grey10"),
+      # legend.text = element_text(size = 6, color = "grey90"),
       legend.key.height = unit(0.4, "cm"),
       legend.key.width = unit(0.4, "cm")
     )
 }
 
 calc_axis_len <- function(axis_grid_data, hierarchy) {
+  axis_grid_data <- st_transform(axis_grid_data, 31982)
   axis_grid_data$dist <- st_length(axis_grid_data$geometry)
   axis_data <- subset(axis_grid_data, !is.na(percentil_speed))
   axis_data$v85_level <- cut(

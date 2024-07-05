@@ -146,7 +146,7 @@
             #author.affiliation,
           ]
           #if "department" in author [
-            #author.department \
+            #author.department,
           ]
           #if "address" in author [
             #author.address
