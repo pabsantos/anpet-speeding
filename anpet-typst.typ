@@ -15,7 +15,7 @@
   body,
 
   // Agradecimentos
-  agradecimentos: [],
+  agradecimentos: none,
 
   // Referências bibliográficas
   bibliography: none
@@ -124,7 +124,7 @@
 
   // Agradecimentos
   if agradecimentos != none [
-    #text(size: 10pt, weight: "bold", [Agradecimentos \ ])
+    #text(size: 10pt, weight: "bold", [ #v(1pt) Agradecimentos \ ])
     #text(size: 10pt, [#agradecimentos])
   ]
 

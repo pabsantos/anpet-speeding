@@ -20,8 +20,13 @@
   bibliography: bibliography(
     "refs.bib",
     title: text(10pt, [REFERENCIAS BIBLIOGRÁFICAS]),
-    style: "apa"
-  )
+    style: "associacao-nacional-de-pesquisa-e-ensino-em-transportes.csl"
+  ),
+  agradecimentos: "Os autores agradecem ao Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq), à Universidade Federal do Paraná e ao Observatório Nacional de Segurança Viária.",
+
+  resumo: "O trabalho tem como objetivo analisar a incidência de velocidades inseguras em Curitiba, Paraná, investigando a existência de um padrão espacial deste fenômeno e sua incidência conforme diferentes hierarquias das vias. Com dados de velocidade instantânea e as coordenadas geográficas do Estudo Naturalístico de Direção Brasileiro (NDS-BR), foram calculadas velocidades de 85º percentil (V85), utilizada como indicador de velocidade insegura. Como unidade espacial ebase para o cálculo, utilizou-se os hexágonos do grid H3. O Moran Local foi utilizado para identificar padrões geográficos da velocidade de 85º percentil (V85). A análise revela que áreas centrais de Curitiba apresentam menores valores de V85, enquanto regiões periféricas e próximas de rodovias mostram maiores valores, explicitando a problemática das travessias urbanas. A investigação destaca que vias locais e coletoras apresentam V85 incompatíveis com suas funções e características. Os resultados sugerem que vias arteriais em Curitiba apresentam melhor desempenho de segurança viária.",
+
+  abstract: "The aim of this study is to analyze the occurrence of unsafe speeds in Curitiba, Brazil, investigating the existence of a spatial pattern of this phenomenon and its occurrence according to different road types. Using data from the Brazilian Naturalistic Driving Study (NDS-BR), 85th percentile speeds (V85) were calculated and used as an indicator of unsafe speed. Hexagons from the H3 grid were used as the spatial unit and basis for the calculation. Local Moran was used to identify geographical patterns of V85. The analysis reveals that central areas of Curitiba have lower V85 values, while peripheral regions and areas near highways show higher values, highlighting the problem of highways in urban environments. The investigation points out that local and collector roads have V85 values that are incompatible with their functions and characteristics. The results suggest that arterial roads in Curitiba perform better in terms of road safety."
 )
 
 // Variáveis ------------------
@@ -118,12 +123,10 @@ O primeiro fator que fica mais explícito é a ocorrência de V85 em todas as fa
 
 = CONCLUSÃO
 
-As altas velocidades e velocidades incompartíveis com o ambiente urbano ainda é um fator de risco para a mobilidade segura nos centros urbanos, principalmente no Brasil. Com o uso dos dados de velocidade instantânea do NDS-BR e do grid H3, foi possível mapear e calcular a autocorrelação local das velocidades inseguras em Curitiba, utilizando o V85 calculado como indicador. Esse processo possibilitou identificar os locais mais inseguros, estabelecidos pelos hexágonos classificados como _High-High_ e _High-Low_.
+Com o uso dos dados de velocidade instantânea do NDS-BR e do grid H3, foi possível mapear e calcular a autocorrelação local das velocidades inseguras em Curitiba, utilizando o V85 calculado como indicador. Esse processo possibilitou identificar os locais mais inseguros, estabelecidos pelos hexágonos classificados como _High-High_ e _High-Low_.
 
 A parte central da cidade apresentou a maior quantidade de clusters _Low-Low_, representando as regiões com velocidades mais seguras. Os hexágonos identificados como _High-High_ estão em sua grande maioria localizados nos contornos rodoviários de Curitiba e outros locais de rodovias que passam pelo território da cidade. Isso mostra um dos problemas das travessias urbanas - vias com veículos transitando em altas velocidades dentro do território urbano. Vias locais também foram englobadas em clusters _High-High_ e outliers _High-Low_, mostrando uma insegurança nessas vias, cujo objetivo é ter uma função mais de acesso com trânsito mais acalmado, mas que vem apresentando velocidades incompartíveis com as suas características, conforme visto na @tbl-dist.
 
 De todas as hierarquias analisadas nas zonas com velocidades mais inseguras, as vias arteriais tiveram a menor extensão englobada nessas áreas. Esse fator se assemelha com o comportamento identificado por #cite(<santosImpactBuiltEnvironment2022>, form: "prose"), em que zonas de tráfego com uma maior densidade de vias arteriais apresentaram uma correlação negativa com a incidência do excesso de velocidade. Os resultados desse trabalho podem ser mais um indicador do desempenho positivo da segurança nas vias arteriais de Curitiba.
 
-Por fim, o presente trabalho buscou analisar a velocidade como um fator de risco sem se basear apenas no excesso de velocidade, mas sim no conceito de velocidades inseguras. Quando os limites de velocidade estabelecidos pelo poder público não atendem a mobilidade segura nas cidades, o diagnóstico com base no excesso de velocidade pode não demonstrar um cenário mais completo.
-
-Para futuras pesquisas, deve-se aprimorar o processo de análise dos eixos das vias. O uso de polígonos para mapear o V85 trouxe uma certa imprecisão para os resultados calculados considerando a hierarquia das vias.
+Por fim, o presente trabalho buscou analisar a velocidade como um fator de risco sem se basear apenas no excesso de velocidade, mas sim no conceito de velocidades inseguras. Quando os limites de velocidade estabelecidos pelo poder público não atendem a mobilidade segura nas cidades, o diagnóstico com base no excesso de velocidade pode não demonstrar um cenário mais completo. Para futuras pesquisas, deve-se aprimorar o processo de análise dos eixos das vias. O uso de polígonos para mapear o V85 trouxe uma certa imprecisão para os resultados calculados considerando a hierarquia das vias.
