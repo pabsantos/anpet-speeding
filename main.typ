@@ -20,7 +20,7 @@
   bibliography: bibliography(
     "refs.bib",
     title: text(10pt, [REFERENCIAS BIBLIOGRÁFICAS]),
-    style: "associacao-nacional-de-pesquisa-e-ensino-em-transportes.csl"
+    style: "apa"
   ),
   agradecimentos: "Os autores agradecem ao Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq), à Universidade Federal do Paraná e ao Observatório Nacional de Segurança Viária.",
 
