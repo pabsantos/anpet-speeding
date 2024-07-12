@@ -3,17 +3,17 @@
 #show: anpet-typst.with(
   authors: (
     (
-      name: "Pedro Augusto Borges dos Santos",
-      affiliation: "Observatório Nacional de Segurança Viária",
-      email: "pedro.borges@onsv.org.br",
-      address: "Estrada Dr. Altino Bondensan, 500 Eugênio de Melo, São José dos Campos - SP"
+      name: "XXXXX",
+      affiliation: "xxxxxxxxx",  
+      email: "xxxxxxxxxx",
+      address: "xxxxxxxxx"
     ),
     (
-      name: "Jorge Tiago Bastos",
-      department: "Departamento de Transportes",
-      affiliation: "Universidade Federal do Paraná",
-      email: "jtbastos@ufpr.br",
-      address: " Avenida Coronel Francisco Heráclito dos Santos, 100 Campus III, Bloco V, Curitiba - PR"
+      name: "XXXXX",
+      department: "xxxxxxx",
+      affiliation: "xxxxxx",
+      email: "xxxxxxxx",
+      address: "xxxxxxxxxx"
     )
   ),
   title: "VELOCIDADES INSEGURAS EM CURITIBA-PR",
@@ -22,7 +22,7 @@
     title: text(10pt, [REFERENCIAS BIBLIOGRÁFICAS]),
     style: "apa"
   ),
-  agradecimentos: "Os autores agradecem ao Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq), à Universidade Federal do Paraná e ao Observatório Nacional de Segurança Viária.",
+  agradecimentos: lorem(25),
 
   resumo: "O trabalho tem como objetivo analisar a incidência de velocidades inseguras em Curitiba, Paraná, investigando a existência de um padrão espacial deste fenômeno e sua incidência conforme diferentes hierarquias das vias. Com dados naturalísticos de velocidade instantânea e as coordenadas geográficas, foram calculadas velocidades de 85º percentil (V85), utilizada como indicador de velocidade insegura. Como unidade espacial de base para o cálculo, utilizou-se os hexágonos do grid H3. O Moran Local foi utilizado para identificar padrões geográficos da velocidade. A análise revela que áreas centrais de Curitiba apresentam menores valores de V85, enquanto regiões periféricas e próximas de rodovias mostram maiores valores, explicitando a problemática das travessias urbanas. A investigação destaca que vias locais e coletoras apresentam V85 incompatíveis com suas funções e características.",
 
