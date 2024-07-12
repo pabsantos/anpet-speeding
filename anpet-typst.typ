@@ -46,7 +46,7 @@
 
   // Configura a fonte e corpo do texto
   set text(font: "Times New Roman", size: 12pt, lang: "pt", hyphenate: false)
-  set par(justify: true, leading: 0.65em)
+  set par(justify: true, leading: 0.5em)
   show par: set block(spacing: 1.3em)
 
   // Configura os títulos de seção
@@ -129,7 +129,15 @@
   ]
 
   // Bibliografia
-  text(10pt, [#bibliography])
+  grid(
+    columns: 1fr,
+    [
+      #set par(leading: 0.5em, justify: true)
+      #set block(spacing: 0.5em)
+      #text(10pt, [#bibliography])
+    ]
+  )
+  //text(10pt, [#bibliography])
   v(5pt)
 
   // Informações finais dos autores
