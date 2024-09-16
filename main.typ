@@ -3,17 +3,17 @@
 #show: anpet-typst.with(
   authors: (
     (
-      name: "XXXXX",
-      affiliation: "xxxxxxxxx",  
-      email: "xxxxxxxxxx",
-      address: "xxxxxxxxx"
+      name: "Pedro Augusto Borges dos Santos",
+      affiliation: "Observatório Nacional de Segurança Viária",  
+      email: "pedro.borges@onsv.org.br",
+      address: "Estrada Dr. Altino Bondensan, 500, Eugênio de Melo, Parque Tecnológico, Centro Empresarial II, sala 2401, São José dos Campos, SP, Brasil"
     ),
     (
-      name: "XXXXX",
-      department: "xxxxxxx",
-      affiliation: "xxxxxx",
-      email: "xxxxxxxx",
-      address: "xxxxxxxxxx"
+      name: "Jorge Tiago Bastos",
+      department: "Departamento de Transportes, Programa de Pós-Graduação em Planejamento Urbano",
+      affiliation: "Universidade Federal do Paraná",
+      email: "jtbastos@ufpr.br",
+      address: "Av. Francisco H. dos Santos, 100, Centro Politécnico - Curitiba, PR, Brasil"
     )
   ),
   title: "VELOCIDADES INSEGURAS EM CURITIBA-PR",
@@ -22,7 +22,7 @@
     title: text(10pt, [REFERENCIAS BIBLIOGRÁFICAS]),
     style: "apa"
   ),
-  agradecimentos: lorem(25),
+  agradecimentos: "Os autores agradecem ao Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq), à Universidade Federal do Paraná e ao Observatório Nacional de Segurança Viária (ONSV) pelo financiamento da pesquisa.",
 
   resumo: "O trabalho tem como objetivo analisar a incidência de velocidades inseguras em Curitiba, Paraná, investigando a existência de um padrão espacial deste fenômeno e sua incidência conforme diferentes hierarquias das vias. Com dados naturalísticos de velocidade instantânea e as coordenadas geográficas, foram calculadas velocidades de 85º percentil (V85), utilizada como indicador de velocidade insegura. Como unidade espacial de base para o cálculo, utilizou-se os hexágonos do grid H3. O Moran Local foi utilizado para identificar padrões geográficos da velocidade. A análise revela que áreas centrais de Curitiba apresentam menores valores de V85, enquanto regiões periféricas e próximas de rodovias mostram maiores valores, explicitando a problemática das travessias urbanas. A investigação destaca que vias locais e coletoras apresentam V85 incompatíveis com suas funções e características.",
 
@@ -121,7 +121,7 @@ Com a velocidade insegura mapeada em Curitiba e seu padrão espacial identificad
   caption: [Extensão de via por V85 e hierarquia, dentro dos hexágonos _High-High_ e _High-Low_]
 ) <tbl-dist> 
 
-O primeiro fator que fica mais explícito é a ocorrência de V85 em todas as faixas entre 40 e 120 km/h nas vias locais, com maior quantidade na faixa entre 70 e 80 km/h, mostrando velocidades inseguras e totalmente incompartíveis com as funções dessa hierarquia viária. No caso das coletoras, a incidência de V85 ficou entre 40 e 90 km/h, com a maior parte entre 50 e 60 km/h. As vias arteriais apresentaram a menor extensão dentro dos hexágonos _High-High_ e _ High-Low_, com V85 variando entre 40 e 80 km/h. As vias de trânsito rápido apresentaram V85 na faixa de 40 a 120 km/h, com a maioria da extensão entre 70 e 80 km/h.
+O primeiro fator que fica mais explícito é a ocorrência de V85 em todas as faixas entre 40 e 120 km/h nas vias locais, com maior quantidade na faixa entre 70 e 80 km/h, mostrando velocidades inseguras e totalmente incompartíveis com as funções dessa hierarquia viária. No caso das coletoras, a incidência de V85 ficou entre 40 e 90 km/h, com a maioria entre 50 e 60 km/h. As vias arteriais apresentaram a menor extensão dentro dos hexágonos _High-High_ e _ High-Low_, com V85 variando entre 40 e 80 km/h. As vias de trânsito rápido apresentaram V85 na faixa de 40 a 120 km/h, com a maioria da extensão entre 70 e 80 km/h.
 
 = CONCLUSÃO
 
